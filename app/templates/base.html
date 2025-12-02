@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ get_locale() }}">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,9 +72,9 @@
                     <!-- Language Switcher -->
                     <div class="flex space-x-2">
                         <a href="{{ url_for('main.set_language', lang='de') }}" 
-                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors {% if get_locale() == 'de' %}bg-cyber-blue text-cyber-dark{% endif %}">DE</a>
+                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors">DE</a>
                         <a href="{{ url_for('main.set_language', lang='en') }}" 
-                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors {% if get_locale() == 'en' %}bg-cyber-blue text-cyber-dark{% endif %}">EN</a>
+                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors">EN</a>
                     </div>
                 </div>
             </div>

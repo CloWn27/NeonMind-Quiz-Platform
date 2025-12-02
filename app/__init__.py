@@ -16,7 +16,6 @@ def create_app(config_name='default'):
         async_mode=app.config['SOCKETIO_ASYNC_MODE'],
         cors_allowed_origins="*"
     )
-    babel.init_app(app)
     
     # Initialize Redis
     redis_client.init_app(app)
@@ -33,7 +32,6 @@ def create_app(config_name='default'):
     socket_events.register_handlers(socketio)
     
     # Babel locale selector
-    @babel.localeselector
     def get_locale():
         from flask import request, session
         # Check if user has set a language preference
@@ -41,5 +39,7 @@ def create_app(config_name='default'):
             return session['language']
         # Otherwise, try to match browser language
         return request.accept_languages.best_match(app.config['LANGUAGES'])
+    
+    babel.init_app(app, locale_selector=get_locale)
     
     return app
