@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Neues Spiel erstellen{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <h1 class="text-5xl font-black mb-12 text-center neon-text">NEUES SPIEL ERSTELLEN</h1>
+    
+    <div class="max-w-2xl mx-auto">
+        <div class="cyber-card p-8">
+            <form id="createGameForm">
+                <!-- Game Mode -->
+                <div class="mb-8">
+                    <label class="block text-xl font-bold mb-4 text-cyber-pink">Spielmodus</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border-2 border-cyber-blue hover:bg-cyber-blue/10 cursor-pointer transition-colors">
+                            <input type="radio" name="modus" value="multiplayer" checked class="mr-4">
+                            <div>
+                                <div class="font-bold text-cyber-blue">🎮 Cyber-Warfare (Multiplayer)</div>
+                                <div class="text-sm text-cyber-blue/60">Kahoot-Style mit mehreren Spielern</div>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 border-2 border-cyber-blue hover:bg-cyber-blue/10 cursor-pointer transition-colors">
+                            <input type="radio" name="modus" value="survival_normal" class="mr-4">
+                            <div>
+                                <div class="font-bold text-cyber-blue">💀 Survival Normal</div>
+                                <div class="text-sm text-cyber-blue/60">Hoher Punktabzug bei Fehlern</div>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 border-2 border-cyber-blue hover:bg-cyber-blue/10 cursor-pointer transition-colors">
+                            <input type="radio" name="modus" value="survival_hardcore" class="mr-4">
+                            <div>
+                                <div class="font-bold text-cyber-blue">☠️ Survival Hardcore</div>
+                                <div class="text-sm text-cyber-blue/60">Falsche Antwort = Rauswurf</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Difficulty -->
+                <div class="mb-8">
+                    <label class="block text-xl font-bold mb-4 text-cyber-pink">Schwierigkeitsgrad</label>
+                    <select name="schwierigkeit" class="cyber-input w-full">
+                        <option value="">Alle Schwierigkeiten</option>
+                        <option value="Leicht">Leicht</option>
+                        <option value="Mittel">Mittel</option>
+                        <option value="Schwer">Schwer</option>
+                        <option value="Profi">Profi</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="cyber-button w-full text-xl py-4">
+                    SPIEL ERSTELLEN
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('createGameForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const data = {
+            modus: formData.get('modus'),
+            schwierigkeit: formData.get('schwierigkeit') || null
+        };
+        
+        try {
+            const response = await fetch('/game/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.redirect) {
+                window.location.href = result.redirect;
+            }
+        } catch (error) {
+            alert('Fehler beim Erstellen des Spiels: ' + error.message);
+        }
+    });
+</script>
+{% endblock %}

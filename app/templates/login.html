@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-20">
+    <div class="max-w-md mx-auto">
+        <div class="cyber-card p-8">
+            <h2 class="text-3xl font-bold mb-8 text-center neon-text">Login</h2>
+            
+            <form method="POST" action="{{ url_for('main.login') }}">
+                <div class="mb-6">
+                    <label class="block mb-2 text-cyber-blue">Username</label>
+                    <input type="text" name="username" required 
+                           class="cyber-input w-full" 
+                           placeholder="Enter username">
+                </div>
+                
+                <div class="mb-8">
+                    <label class="block mb-2 text-cyber-blue">Password</label>
+                    <input type="password" name="password" required 
+                           class="cyber-input w-full" 
+                           placeholder="Enter password">
+                </div>
+                
+                <button type="submit" class="cyber-button w-full">
+                    Login
+                </button>
+            </form>
+            
+            <div class="mt-8 text-center text-cyber-blue/60">
+                <p class="mb-2">Demo Accounts:</p>
+                <p class="text-sm">admin / admin123</p>
+                <p class="text-sm">player1 / player123</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

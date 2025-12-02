@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Host - {{ room_code }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-cyber-darker p-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-5xl font-black neon-text">NEON<span class="text-cyber-pink">MIND</span></h1>
+        <div class="text-right">
+            <p class="text-cyber-blue/60 mb-1">Room Code</p>
+            <p class="text-5xl font-black neon-pink-text tracking-widest">{{ room_code }}</p>
+        </div>
+    </div>
+    
+    <!-- Waiting Screen -->
+    <div id="waitingScreen" class="text-center py-20">
+        <div class="text-8xl mb-8 animate-pulse">🎮</div>
+        <h2 class="text-4xl font-bold neon-text mb-8">Warte auf Spieler...</h2>
+        
+        <div class="max-w-4xl mx-auto">
+            <div class="cyber-card p-8 mb-8">
+                <h3 class="text-2xl font-bold mb-6 text-cyber-pink">Verbundene Spieler</h3>
+                <div id="playersList" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <button id="startGameBtn" class="cyber-button text-2xl px-12 py-6">
+                SPIEL STARTEN
+            </button>
+        </div>
+    </div>
+    
+    <!-- Question Screen -->
+    <div id="questionScreen" class="hidden">
+        <!-- Timer -->
+        <div class="mb-8">
+            <div class="cyber-progress h-6">
+                <div id="timerBar" class="cyber-progress-bar" style="width: 100%"></div>
+            </div>
+            <p class="text-center mt-4 text-4xl font-bold text-cyber-blue" id="timeRemaining">30s</p>
+        </div>
+        
+        <!-- Question -->
+        <div class="cyber-card p-12 mb-8">
+            <p class="text-cyber-blue/60 mb-4 text-xl">Frage <span id="questionNumber">1</span></p>
+            <h2 class="text-4xl font-bold neon-pink-text mb-6" id="questionText"></h2>
+            <div id="codeSnippet" class="hidden bg-cyber-dark/50 p-6 rounded font-mono text-lg"></div>
+        </div>
+        
+        <!-- Answers Grid -->
+        <div id="answersGrid" class="grid grid-cols-2 gap-6">
+            <!-- Dynamically populated -->
+        </div>
+        
+        <!-- Answer Stats -->
+        <div class="mt-8 text-center">
+            <p class="text-cyber-blue/60 text-xl">
+                <span id="answeredCount">0</span> / <span id="totalPlayers">0</span> Spieler haben geantwortet
+            </p>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Screen -->
+    <div id="leaderboardScreen" class="hidden">
+        <h2 class="text-5xl font-black neon-text text-center mb-12">LEADERBOARD</h2>
+        <div class="max-w-4xl mx-auto">
+            <div id="leaderboardList" class="space-y-4">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button id="nextQuestionBtn" class="cyber-button text-2xl px-12 py-6">
+                    NÄCHSTE FRAGE
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Final Results -->
+    <div id="finalScreen" class="hidden text-center py-20">
+        <h2 class="text-6xl font-black neon-text mb-12">SPIEL BEENDET</h2>
+        <div class="max-w-4xl mx-auto">
+            <div class="cyber-card p-12">
+                <h3 class="text-3xl font-bold mb-8 text-cyber-pink">Final Leaderboard</h3>
+                <div id="finalLeaderboard" class="space-y-4">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <a href="{{ url_for('main.dashboard') }}" class="cyber-button mt-12 inline-block text-2xl px-12 py-6">
+                ZURÜCK ZUM DASHBOARD
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const roomCode = "{{ room_code }}";
+    const socket = io();
+    
+    let players = [];
+    let answeredPlayers = new Set();
+    
+    socket.on('connect', () => {
+        socket.emit('join_game', { room_code: roomCode });
+    });
+    
+    socket.on('player_joined', (data) => {
+        players.push(data);
+        updatePlayersList();
+    });
+    
+    socket.on('new_question', (data) => {
+        showQuestion(data);
+    });
+    
+    socket.on('player_answered', (data) => {
+        answeredPlayers.add(data.user_id);
+        updateAnswerStats();
+    });
+    
+    socket.on('game_finished', (data) => {
+        showFinalResults(data);
+    });
+    
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+        socket.emit('start_game', { room_code: roomCode });
+    });
+    
+    document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+        socket.emit('next_question', { room_code: roomCode });
+    });
+    
+    function updatePlayersList() {
+        const list = document.getElementById('playersList');
+        list.innerHTML = players.map(p => `
+            <div class="cyber-card p-4 text-center">
+                <div class="text-3xl mb-2">🤖</div>
+                <p class="text-cyber-blue font-bold">${p.username}</p>
+            </div>
+        `).join('');
+    }
+    
+    function showQuestion(data) {
+        document.getElementById('waitingScreen').classList.add('hidden');
+        document.getElementById('leaderboardScreen').classList.add('hidden');
+        document.getElementById('questionScreen').classList.remove('hidden');
+        
+        document.getElementById('questionNumber').innerText = data.question_number;
+        document.getElementById('questionText').innerText = data.frage_text;
+        
+        if (data.code_snippet) {
+            document.getElementById('codeSnippet').innerText = data.code_snippet;
+            document.getElementById('codeSnippet').classList.remove('hidden');
+        }
+        
+        const grid = document.getElementById('answersGrid');
+        grid.innerHTML = data.antworten.map((a, i) => `
+            <div class="cyber-card p-8 text-center">
+                <div class="text-5xl font-black text-cyber-pink mb-4">${String.fromCharCode(65 + i)}</div>
+                <p class="text-2xl text-cyber-blue">${a.text}</p>
+            </div>
+        `).join('');
+        
+        answeredPlayers.clear();
+        updateAnswerStats();
+        startTimer(data.zeit_sekunden);
+    }
+    
+    function updateAnswerStats() {
+        document.getElementById('answeredCount').innerText = answeredPlayers.size;
+        document.getElementById('totalPlayers').innerText = players.length;
+    }
+    
+    function startTimer(seconds) {
+        let remaining = seconds;
+        const bar = document.getElementById('timerBar');
+        const display = document.getElementById('timeRemaining');
+        
+        const interval = setInterval(() => {
+            remaining--;
+            bar.style.width = (remaining / seconds * 100) + '%';
+            display.innerText = remaining + 's';
+            
+            if (remaining <= 0) {
+                clearInterval(interval);
+                setTimeout(() => showLeaderboard(), 2000);
+            }
+        }, 1000);
+    }
+    
+    function showLeaderboard() {
+        document.getElementById('questionScreen').classList.add('hidden');
+        document.getElementById('leaderboardScreen').classList.remove('hidden');
+    }
+    
+    function showFinalResults(data) {
+        document.getElementById('questionScreen').classList.add('hidden');
+        document.getElementById('leaderboardScreen').classList.add('hidden');
+        document.getElementById('finalScreen').classList.remove('hidden');
+        
+        const list = document.getElementById('finalLeaderboard');
+        list.innerHTML = data.leaderboard.map((p, i) => `
+            <div class="leaderboard-item rank-${i + 1}">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="text-4xl font-black text-cyber-yellow mr-6">#${i + 1}</span>
+                        <div>
+                            <p class="text-2xl font-bold text-cyber-blue">${p.username}</p>
+                            <p class="text-cyber-blue/60">Streak: ${p.streak_max}</p>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-black text-cyber-pink">${p.score}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+</script>
+{% endblock %}

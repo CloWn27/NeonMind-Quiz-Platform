@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NeonMind{% endblock %} - Cyberpunk FiSi Quiz</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Cyberpunk Theme -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cyber-blue': '#00f0ff',
+                        'cyber-pink': '#ff00ff',
+                        'cyber-yellow': '#ffff00',
+                        'cyber-dark': '#0a0e27',
+                        'cyber-darker': '#050814',
+                    },
+                    fontFamily: {
+                        'cyber': ['Orbitron', 'sans-serif'],
+                    },
+                    animation: {
+                        'glitch': 'glitch 1s linear infinite',
+                        'neon-pulse': 'neon-pulse 2s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for Radar Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cyberpunk.css') }}">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-cyber-darker text-cyber-blue font-cyber min-h-screen">
+    <!-- Cyberpunk Grid Background -->
+    <div class="fixed inset-0 bg-gradient-to-b from-cyber-darker via-cyber-dark to-cyber-darker opacity-50 pointer-events-none"></div>
+    <div class="fixed inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZjBmZiIgb3BhY2l0eT0iMC4xIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20 pointer-events-none"></div>
+    
+    <!-- Navigation -->
+    <nav class="relative z-10 bg-cyber-dark/80 backdrop-blur-sm border-b-2 border-cyber-blue shadow-lg shadow-cyber-blue/20">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="{{ url_for('main.index') }}" class="text-3xl font-black tracking-wider hover:text-cyber-pink transition-colors">
+                    <span class="text-cyber-blue">NEON</span><span class="text-cyber-pink">MIND</span>
+                </a>
+                
+                <div class="flex items-center space-x-6">
+                    {% if session.get('user_id') %}
+                        <a href="{{ url_for('main.dashboard') }}" class="hover:text-cyber-pink transition-colors">Dashboard</a>
+                        <a href="{{ url_for('game.create_game') }}" class="hover:text-cyber-pink transition-colors">Neues Spiel</a>
+                        <a href="{{ url_for('game.join_game') }}" class="hover:text-cyber-pink transition-colors">Spiel beitreten</a>
+                        <a href="{{ url_for('main.logout') }}" class="hover:text-cyber-pink transition-colors">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="hover:text-cyber-pink transition-colors">Login</a>
+                    {% endif %}
+                    
+                    <!-- Language Switcher -->
+                    <div class="flex space-x-2">
+                        <a href="{{ url_for('main.set_language', lang='de') }}" 
+                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors {% if get_locale() == 'de' %}bg-cyber-blue text-cyber-dark{% endif %}">DE</a>
+                        <a href="{{ url_for('main.set_language', lang='en') }}" 
+                           class="px-2 py-1 border border-cyber-blue hover:bg-cyber-blue hover:text-cyber-dark transition-colors {% if get_locale() == 'en' %}bg-cyber-blue text-cyber-dark{% endif %}">EN</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="relative z-10">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="relative z-10 mt-20 py-8 border-t border-cyber-blue/30">
+        <div class="container mx-auto px-4 text-center text-cyber-blue/60">
+            <p>&copy; 2024 NeonMind. Powered by Cyberpunk Technology.</p>
+        </div>
+    </footer>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

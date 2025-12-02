@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-20">
+    <!-- Hero Section -->
+    <div class="text-center mb-20">
+        <h1 class="text-7xl font-black mb-6 neon-text animate-neon-pulse">
+            NEON<span class="text-cyber-pink">MIND</span>
+        </h1>
+        <p class="text-2xl mb-4 text-cyber-blue/80">
+            Cyberpunk FiSi Quiz Platform
+        </p>
+        <p class="text-lg text-cyber-blue/60 max-w-2xl mx-auto mb-12">
+            Tauche ein in die Welt der Systemadministration. Lerne, kämpfe, überlebe. 
+            Kahoot-Style Multiplayer trifft auf IHK Lernfelder im Cyberpunk 2077 Design.
+        </p>
+        
+        {% if not session.get('user_id') %}
+        <div class="flex justify-center space-x-6">
+            <a href="{{ url_for('main.login') }}" class="cyber-button">
+                Login / Register
+            </a>
+        </div>
+        {% else %}
+        <div class="flex justify-center space-x-6">
+            <a href="{{ url_for('main.dashboard') }}" class="cyber-button">
+                Dashboard
+            </a>
+            <a href="{{ url_for('game.create_game') }}" class="cyber-button cyber-button-pink">
+                Neues Spiel starten
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mb-20">
+        <!-- Multiplayer -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">🎮</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">Cyber-Warfare</h3>
+            <p class="text-cyber-blue/80">
+                Kahoot-Style Multiplayer mit Host-View (Beamer) und Controller-View (Smartphone). 
+                Nutze Jammer-Hacks gegen deine Gegner!
+            </p>
+        </div>
+        
+        <!-- Survival Mode -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">💀</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">Survival-Modus</h3>
+            <p class="text-cyber-blue/80">
+                Hardcore: Falsche Antwort = Rauswurf. Normal: Hoher Punktabzug. 
+                Wie lange kannst du überleben?
+            </p>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">🏠</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">The Safehouse</h3>
+            <p class="text-cyber-blue/80">
+                Dein Dashboard mit Radar-Chart zur Visualisierung deiner Kompetenz 
+                in allen IHK Lernfeldern.
+            </p>
+        </div>
+        
+        <!-- Avatar Editor -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">🤖</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">Ripperdoc</h3>
+            <p class="text-cyber-blue/80">
+                Erstelle deinen einzigartigen Cyberpunk-Avatar mit Layer-System: 
+                Kopf, Cyberware, Farbe.
+            </p>
+        </div>
+        
+        <!-- Progression -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">⚡</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">XP & Level</h3>
+            <p class="text-cyber-blue/80">
+                Sammle XP, steige Level auf, schalte Achievements frei. 
+                Streak-Boni für perfekte Serien!
+            </p>
+        </div>
+        
+        <!-- Admin -->
+        <div class="cyber-card p-8 scanline">
+            <div class="text-5xl mb-4">👁️</div>
+            <h3 class="text-2xl font-bold mb-4 text-cyber-pink">God-Mode</h3>
+            <p class="text-cyber-blue/80">
+                Admin-Panel zur Steuerung laufender Spiele, User kicken, 
+                Fragen annullieren.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Tech Stack -->
+    <div class="text-center">
+        <h2 class="text-3xl font-bold mb-8 neon-pink-text">Powered by</h2>
+        <div class="flex flex-wrap justify-center gap-6 text-cyber-blue/60">
+            <span class="px-4 py-2 border border-cyber-blue/30">Flask</span>
+            <span class="px-4 py-2 border border-cyber-blue/30">PostgreSQL</span>
+            <span class="px-4 py-2 border border-cyber-blue/30">Redis</span>
+            <span class="px-4 py-2 border border-cyber-blue/30">SocketIO</span>
+            <span class="px-4 py-2 border border-cyber-blue/30">Tailwind CSS</span>
+            <span class="px-4 py-2 border border-cyber-blue/30">Chart.js</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: neonmind_db
+    environment:
+      POSTGRES_USER: neonmind
+      POSTGRES_PASSWORD: neonmind123
+      POSTGRES_DB: neonmind
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - neonmind_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neonmind"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: neonmind_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - neonmind_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Flask Web Application
+  web:
+    build: .
+    container_name: neonmind_web
+    environment:
+      FLASK_APP: run.py
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://neonmind:neonmind123@db:5432/neonmind
+      REDIS_URL: redis://redis:6379/0
+      SOCKETIO_MESSAGE_QUEUE: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - neonmind_network
+    volumes:
+      - ./data:/app/data
+    command: gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:5000 run:app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  neonmind_network:
+    driver: bridge

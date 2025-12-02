@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Controller - {{ room_code }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8" id="controllerApp">
+    <!-- Room Code Display -->
+    <div class="text-center mb-8">
+        <h2 class="text-4xl font-black neon-text mb-2">ROOM: {{ room_code }}</h2>
+        <p class="text-cyber-blue/60">Controller View</p>
+    </div>
+    
+    <!-- Player Stats -->
+    <div class="cyber-card p-6 mb-8">
+        <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+                <p class="text-cyber-blue/60 text-sm mb-1">Score</p>
+                <p class="text-3xl font-bold text-cyber-yellow" id="playerScore">0</p>
+            </div>
+            <div>
+                <p class="text-cyber-blue/60 text-sm mb-1">Streak</p>
+                <p class="text-3xl font-bold text-cyber-pink" id="playerStreak">0</p>
+            </div>
+            <div>
+                <p class="text-cyber-blue/60 text-sm mb-1">Level</p>
+                <p class="text-3xl font-bold text-cyber-blue" id="playerLevel">{{ user.level }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Status -->
+    <div id="waitingScreen" class="text-center py-20">
+        <div class="text-6xl mb-6 animate-pulse">⏳</div>
+        <h3 class="text-2xl font-bold neon-text mb-4">Warte auf Spielstart...</h3>
+        <p class="text-cyber-blue/60">Der Host wird das Spiel gleich starten</p>
+    </div>
+    
+    <!-- Question Screen -->
+    <div id="questionScreen" class="hidden">
+        <!-- Timer -->
+        <div class="mb-6">
+            <div class="cyber-progress">
+                <div id="timerBar" class="cyber-progress-bar" style="width: 100%"></div>
+            </div>
+            <p class="text-center mt-2 text-cyber-blue" id="timeRemaining">30s</p>
+        </div>
+        
+        <!-- Question -->
+        <div class="cyber-card p-8 mb-8">
+            <h3 class="text-2xl font-bold mb-4 neon-pink-text" id="questionText"></h3>
+            <div id="codeSnippet" class="hidden bg-cyber-dark/50 p-4 rounded mb-4 font-mono text-sm"></div>
+        </div>
+        
+        <!-- Answers -->
+        <div id="answersContainer" class="space-y-4">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+    
+    <!-- Result Screen -->
+    <div id="resultScreen" class="hidden text-center py-12">
+        <div id="resultIcon" class="text-8xl mb-6"></div>
+        <h3 id="resultText" class="text-3xl font-bold mb-4"></h3>
+        <div id="resultDetails" class="text-xl text-cyber-blue/80"></div>
+    </div>
+    
+    <!-- Game Finished -->
+    <div id="finishedScreen" class="hidden text-center py-12">
+        <h2 class="text-4xl font-black neon-text mb-8">SPIEL BEENDET</h2>
+        <div class="cyber-card p-8 max-w-md mx-auto">
+            <h3 class="text-2xl font-bold mb-6 text-cyber-pink">Deine Stats</h3>
+            <div class="space-y-3 text-left">
+                <p><span class="text-cyber-blue/60">Endpunktzahl:</span> <span class="text-cyber-yellow font-bold" id="finalScore">0</span></p>
+                <p><span class="text-cyber-blue/60">Beste Streak:</span> <span class="text-cyber-pink font-bold" id="finalStreak">0</span></p>
+            </div>
+            <a href="{{ url_for('main.dashboard') }}" class="cyber-button mt-8 inline-block">
+                Zurück zum Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Wake Lock Indicator -->
+    <div id="wakeLockIndicator" class="hidden wake-lock-active">
+        🔒 Display aktiv
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/controller.js') }}"></script>
+<script>
+    const roomCode = "{{ room_code }}";
+    const userId = {{ session.get('user_id') }};
+    
+    // Initialize controller
+    const controller = new GameController(roomCode, userId);
+    controller.init();
+</script>
+{% endblock %}

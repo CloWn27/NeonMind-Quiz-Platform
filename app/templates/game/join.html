@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Spiel beitreten{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-20">
+    <h1 class="text-5xl font-black mb-12 text-center neon-text">SPIEL BEITRETEN</h1>
+    
+    <div class="max-w-md mx-auto">
+        <div class="cyber-card p-8">
+            <form id="joinGameForm">
+                <div class="mb-8">
+                    <label class="block text-xl font-bold mb-4 text-cyber-pink">Room Code</label>
+                    <input type="text" 
+                           name="room_code" 
+                           required 
+                           maxlength="6"
+                           class="cyber-input w-full text-center text-3xl tracking-widest uppercase" 
+                           placeholder="ABC123"
+                           pattern="[A-Z0-9]{6}">
+                    <p class="text-cyber-blue/60 text-sm mt-2">Gib den 6-stelligen Room Code ein</p>
+                </div>
+                
+                <button type="submit" class="cyber-button w-full text-xl py-4">
+                    BEITRETEN
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const input = document.querySelector('input[name="room_code"]');
+    
+    // Auto-uppercase
+    input.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase();
+    });
+    
+    document.getElementById('joinGameForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const roomCode = new FormData(e.target).get('room_code');
+        window.location.href = `/game/controller/${roomCode}`;
+    });
+</script>
+{% endblock %}

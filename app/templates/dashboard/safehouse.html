@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}The Safehouse{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <h1 class="text-5xl font-black mb-12 neon-text">THE SAFEHOUSE</h1>
+    
+    <!-- User Info Card -->
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="cyber-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-cyber-pink">Netrunner Profile</h3>
+            <div class="space-y-3">
+                <p><span class="text-cyber-blue/60">Username:</span> <span class="text-cyber-blue font-bold">{{ user.username }}</span></p>
+                <p><span class="text-cyber-blue/60">Level:</span> <span class="text-cyber-yellow font-bold text-2xl">{{ user.level }}</span></p>
+                <p><span class="text-cyber-blue/60">XP:</span> <span class="text-cyber-blue">{{ user.xp }}</span></p>
+                <p><span class="text-cyber-blue/60">Next Level:</span> <span class="text-cyber-blue">{{ ((user.level ** 2) * 100) - user.xp }} XP</span></p>
+            </div>
+        </div>
+        
+        <div class="cyber-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-cyber-pink">Quick Actions</h3>
+            <div class="space-y-3">
+                <a href="{{ url_for('game.create_game') }}" class="block cyber-button text-center">
+                    Neues Spiel
+                </a>
+                <a href="{{ url_for('game.join_game') }}" class="block cyber-button text-center">
+                    Spiel beitreten
+                </a>
+                <a href="{{ url_for('main.avatar_editor') }}" class="block cyber-button cyber-button-pink text-center">
+                    Avatar Editor
+                </a>
+            </div>
+        </div>
+        
+        <div class="cyber-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-cyber-pink">Avatar</h3>
+            <div class="avatar-preview mx-auto bg-cyber-dark/50">
+                <div class="flex items-center justify-center h-full text-6xl">
+                    🤖
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Radar Chart -->
+    <div class="cyber-card p-8 mb-12">
+        <h2 class="text-3xl font-bold mb-8 text-center neon-pink-text">Kompetenz-Analyse</h2>
+        <div class="max-w-2xl mx-auto">
+            <canvas id="radarChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="cyber-card p-8">
+        <h2 class="text-2xl font-bold mb-6 text-cyber-pink">Recent Activity</h2>
+        <div class="text-cyber-blue/60 text-center py-8">
+            <p>Keine aktuellen Aktivitäten</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Fetch user stats and render radar chart
+    fetch('/api/user/stats')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Kompetenz (%)',
+                        data: data.data,
+                        backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                        borderColor: 'rgba(0, 240, 255, 1)',
+                        pointBackgroundColor: 'rgba(0, 240, 255, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(0, 240, 255, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#00f0ff',
+                                backdropColor: 'transparent'
+                            },
+                            grid: {
+                                color: 'rgba(0, 240, 255, 0.2)'
+                            },
+                            pointLabels: {
+                                color: '#00f0ff',
+                                font: {
+                                    size: 14,
+                                    family: 'Orbitron'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#00f0ff',
+                                font: {
+                                    family: 'Orbitron'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error loading stats:', error);
+        });
+</script>
+{% endblock %}
