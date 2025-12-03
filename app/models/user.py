@@ -54,7 +54,7 @@ class User(db.Model):
     
     def get_stats_by_lernfeld(self):
         """Get user performance statistics grouped by Lernfeld"""
-        from app.models.spiel import Teilnahme
+        from app.models.spiel import Teilnahme, SpielSitzung
         from app.models.frage import Frage
         from app.models.lernfeld import Lernfeld
         from sqlalchemy import func
