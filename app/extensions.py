@@ -21,8 +21,18 @@ class RedisClient:
     
     def init_app(self, app):
         """Initialize Redis client with app config"""
-        redis_url = app.config['REDIS_URL']
-        self.client = redis.from_url(redis_url, decode_responses=True)
+        try:
+            redis_url = app.config.get('REDIS_URL')
+            if redis_url:
+                self.client = redis.from_url(redis_url, decode_responses=True, socket_connect_timeout=2)
+                # Test connection
+                self.client.ping()
+                app.logger.info('✅ Redis connected successfully')
+            else:
+                app.logger.warning('⚠️  Redis URL not configured, running without Redis')
+        except Exception as e:
+            app.logger.warning(f'⚠️  Redis connection failed: {e}. Running without Redis.')
+            self.client = None
     
     def get(self, key):
         """Get value from Redis"""
