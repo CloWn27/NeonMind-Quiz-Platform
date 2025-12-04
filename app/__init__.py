@@ -42,4 +42,19 @@ def create_app(config_name='default'):
     
     babel.init_app(app, locale_selector=get_locale)
     
+    # Add Content Security Policy headers for development
+    @app.after_request
+    def add_security_headers(response):
+        # Allow eval() for SocketIO and dynamic JS (development only)
+        if app.config.get('ENV') == 'development' or app.config.get('DEBUG'):
+            response.headers['Content-Security-Policy'] = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.socket.io https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+                "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; "
+                "font-src 'self' https://fonts.gstatic.com; "
+                "img-src 'self' data: https:; "
+                "connect-src 'self' ws: wss:;"
+            )
+        return response
+    
     return app
