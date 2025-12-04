@@ -151,7 +151,6 @@ def seed_database(json_filepath):
 def create_sample_users():
     """Create sample users for testing"""
     from app.models import User
-    from werkzeug.security import generate_password_hash
     
     print("\n👥 Creating sample users...")
     
@@ -190,10 +189,10 @@ def create_sample_users():
             user = User(
                 username=user_data['username'],
                 email=user_data['email'],
-                password_hash=generate_password_hash(user_data['password']),
                 xp=user_data['xp'],
                 level=user_data['level']
             )
+            user.set_password(user_data['password'])  # Use secure password hashing
             db.session.add(user)
         
         db.session.commit()

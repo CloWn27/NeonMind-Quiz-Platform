@@ -8,6 +8,16 @@ class Config:
     """Base configuration"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     
+    # Session Security
+    SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    PERMANENT_SESSION_LIFETIME = 86400  # 24 hours in seconds
+    
+    # CSRF Protection
+    WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = None  # No time limit for CSRF tokens
+    
     # Database
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://neonmind:neonmind123@localhost:5432/neonmind')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -48,6 +58,7 @@ class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
     TESTING = False
+    SESSION_COOKIE_SECURE = True  # Require HTTPS in production
 
 
 class TestingConfig(Config):

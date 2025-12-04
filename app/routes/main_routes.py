@@ -48,18 +48,24 @@ def set_language(lang):
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Simple login (placeholder - implement proper auth)"""
+    """User login with password verification"""
+    error = None
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         
         user = User.query.filter_by(username=username).first()
-        # TODO: Implement proper password hashing with werkzeug.security
-        if user:
+        
+        if user and user.check_password(password):
             session['user_id'] = user.id
+            session.permanent = True  # Use permanent session
+            user.last_login = db.func.now()
+            db.session.commit()
             return redirect(url_for('main.dashboard'))
+        else:
+            error = 'Ungültiger Benutzername oder Passwort'
     
-    return render_template('login.html')
+    return render_template('login.html', error=error)
 
 
 @main_bp.route('/logout')

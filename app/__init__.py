@@ -1,6 +1,6 @@
 from flask import Flask
 from config import config
-from app.extensions import db, socketio, babel, redis_client
+from app.extensions import db, socketio, babel, redis_client, csrf
 
 
 def create_app(config_name='default'):
@@ -19,6 +19,9 @@ def create_app(config_name='default'):
     
     # Initialize Redis
     redis_client.init_app(app)
+    
+    # Initialize CSRF Protection
+    csrf.init_app(app)
     
     # Register blueprints
     from app.routes import main_bp, game_bp, admin_bp, api_bp

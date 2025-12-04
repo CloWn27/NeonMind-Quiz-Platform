@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from flask_babel import Babel
+from flask_wtf.csrf import CSRFProtect
 import redis
 
 
@@ -12,6 +13,9 @@ socketio = SocketIO()
 
 # Babel for i18n
 babel = Babel()
+
+# CSRF Protection
+csrf = CSRFProtect()
 
 
 class RedisClient:
